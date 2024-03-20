@@ -23,6 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core_external\external_api;
+use core_external\external_settings;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/webservice/lib.php");
@@ -61,12 +64,12 @@ class webservice_restful_server extends webservice_base_server {
      */
     private function get_apache_headers() {
         $capitalizearray = array(
-            'Content-Type',
-            'Accept',
-            'Authorization',
-            'Content-Length',
-            'User-Agent',
-            'Host'
+                'Content-Type',
+                'Accept',
+                'Authorization',
+                'Content-Length',
+                'User-Agent',
+                'Host'
         );
         $headers = apache_request_headers();
         $returnheaders = array();
@@ -305,12 +308,11 @@ class webservice_restful_server extends webservice_base_server {
 
         // Log the web service request.
         $params = array(
-            'other' => array(
-                'function' => $this->functionname
-            )
+                'other' => array(
+                        'function' => $this->functionname
+                )
         );
         $event = \core\event\webservice_function_called::create($params);
-        $event->set_legacy_logdata(array(SITEID, 'webservice', $this->functionname, '' , getremoteaddr() , 0, $this->userid));
         $event->trigger();
 
         // Do additional setup stuff.
@@ -410,6 +412,9 @@ class webservice_restful_server extends webservice_base_server {
             $errorobject = new stdClass;
             $errorobject->exception = get_class($ex);
             $errorobject->errorcode = $ex->errorcode;
+            if (isset($ex->errorcode)) {
+                $errorobject->errorcode = $ex->errorcode;
+            }
             $errorobject->message = $ex->getMessage();
             if (debugging() and isset($ex->debuginfo)) {
                 $errorobject->debuginfo = $ex->debuginfo;
